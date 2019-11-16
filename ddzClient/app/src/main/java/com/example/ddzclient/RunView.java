@@ -456,11 +456,13 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         exitPos.left_x = (tra.ScreenX - clockPos_left.width) / 2;
         exitPos.top_y = tra.ScreenY / 2;
     }
+
     //surfaceview 创建
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.i("surface", "surfaceCreated: ");
     }
+
     //surfaceview 发生变化
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -472,6 +474,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.i("surface", "surfaceDestroyed: ");
     }
+
     //绘制的判断
     public void drawRunMain() {
         if (isShowPoker) {
@@ -491,6 +494,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             getHolder().unlockCanvasAndPost(canvas);
         }
     }
+
     //第一次接收到自己卡牌的动画绘制
     public void showFirstRecvPoker() {
         for (int i = 1; i < 17; i++) {
@@ -516,8 +520,10 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         isShowPoker = false;
     }
+
     //判断是否时第一个抢地主的变量
     private boolean isFirstLoot = true;
+
     //绘制抢地主阶段画面
     public void drawRunOnLoot(Canvas canvas) {
         if (sequence == turn) {//自己回合要绘制按钮
@@ -560,6 +566,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         //绘制用户头像和手牌数量
         drawUsersInfo(canvas);
     }
+
     //绘制出牌阶段画面
     public void drawRunOnPoke(Canvas canvas) {
         if (sequence == turn) {//自己回合要绘制按钮
@@ -618,6 +625,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         //绘制用户头像和手牌数量
         drawUsersInfo(canvas);
     }
+
     //绘制结束阶段画面
     public void drawOnEnd(Canvas canvas) {
         Paint paint = new Paint();
@@ -627,6 +635,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawText("游戏结束", start_x, tra.ScreenY / 2 - resultftPos_mid.height, paint);
         exitPos.drawBitmap(exit_bmp, canvas);
     }
+
     //绘制地主三张牌
     private void drawLooterThreePoker(Canvas canvas) {
         if (isGetThreepoker) {//已经收到地主牌
@@ -645,6 +654,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             lopokerPos.left_x = ix;
         }
     }
+
     //会出抢地主情况
     private void drawLootResult(Canvas canvas) {
         if (turn != last_seq) {
@@ -672,6 +682,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //绘制手牌
     private void drawHandpoker(Canvas canvas) {
         for (int i = 0; i < handpoker_num[sequence]; i++) {
@@ -686,6 +697,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //绘制打出的牌
     private void drawPokedPoker(Canvas canvas) {
         if (turn != last_seq) {
@@ -728,6 +740,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //绘制用户头像和手牌数量
     private void drawUsersInfo(Canvas canvas) {
         if (game_status == data_run.run_status.LOOT) {
@@ -792,11 +805,13 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
 
         }
     }
+
     //接收到抢地主数据的调用
     public void recvLoot(int turn, boolean lootOrNot) {
         isLoot[turn] = lootOrNot ? 1 : 0;
         //不需要更新画面  在下次收到跟换回合时会更新
     }
+
     //游戏回合剩余时间改变的调用
     public void recvTime() {
         //重新测量剩余时间字符长度
@@ -814,18 +829,21 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         //更新画面
         drawRunMain();
     }
+
     //游戏进度改变的调用 //一般需要改变画面
     public void changeStatus(int run_status) throws IOException {
         game_status = run_status;
         remain_sec = 15;
         drawRunMain();
     }
+
     //抢地主阶段回合改变的调用
     public void changeTurnOnLoot(int newTurn) {
         turn = newTurn;
         remain_sec = 15;
         drawRunMain();
     }
+
     //出牌阶段回合改变的调用
     public void changeTurnOnPoke(int newTurn) throws Exception {
         turn = newTurn;
@@ -839,6 +857,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             drawRunMain();
         }
     }
+
     //将抢地主结果保存
     public void setLootResult(data_run.looter_data ld) {
         looter_sequence = ld.sequence;
@@ -858,6 +877,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         //主动更新画面
         drawRunMain();
     }
+
     //自己是地主时将地主牌添加到自己手牌
     public void addThreeToHandpoker() {
         int pos_move = 3;
@@ -889,6 +909,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             threepokerIndex--;
         }
     }
+
     //将出的牌加入lastpoker//改变手牌数据//通知更改绘制的 handpoker_pos_x
     public void changeHandpokerData() {
         if (lastpoker_num[sequence] != 0) {
@@ -911,10 +932,12 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
     }
+
     //当手牌数量改变时更改绘制的 handpoker_pos_x
     public void changeHandpokerPosX() {
         handpoker_left_x = (tra.ScreenX - (handpoker_num[sequence] - 1) * handpoker_interval - handpokerPos.width) / 2;
     }
+
     //别人出了牌//返回出的卡牌   接受卡牌
     public void changePokedpokerData() throws IOException {
         //接受牌类型和点数
@@ -950,6 +973,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         drawRunMain();
     }
+
     //根据卡牌数据获得卡牌在数组中的下标
     public int getPokerIndex(data_run.poker poker) {
         if (poker.kind <= data_run.pkr_kind.POKER_A)
@@ -961,6 +985,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         else
             return 53;
     }
+
     //抢地主阶段的触摸事件处理
     private void buttonClickOnLoot(int x, int y) {
         //抢地主 不抢 两个
@@ -971,6 +996,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             tra.ClickLoot(false);
         }
     }
+
     //出牌阶段的触摸事件处理
     private void buttonClickOnPoke(int x, int y) {
         //不出   提示  出牌  卡牌
@@ -1035,12 +1061,14 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //游戏结束阶段的触摸事件处理
     private void buttonClickOnEnd(int x, int y) {
         if ((x >= exitPos.left_x) && (x <= exitPos.getRightX()) && (y >= exitPos.top_y) && (y <= exitPos.getBottomY())) {
             tra.ClickExit();
         }
     }
+
     //触摸事件分发
     private void buttonClick(int x, int y) {
         switch (game_status) {
@@ -1056,6 +1084,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
         }
     }
+
     //相应触摸事件
     public void handleTouch(MotionEvent event) {
         switch (event.getAction()) {
@@ -1067,6 +1096,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         Log.i("pos", "handleTouch: " + Float.toString(event.getX()) + " " + Float.toString(event.getY()));
     }
+
     //自动出牌提示
     private boolean setHintPoker() {//找出最佳选择 和一个副选
         if (sequence == turn) {
@@ -1074,24 +1104,43 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                 handpoker_isSelect[i] = false;
             }
             if (isFirst) {//第一个出牌 随便出
-                        if(!onFurwhtwo(-1)){
-                            if(!onPlaneone(-1)){
-                                if(!onPlanezer(-1)){
-                                    if(!onDoublecn(-1)){
-                                        if(!onContinue(-1)){
-                                            if(!onThrwhtwo(-1)){
-                                                if(!onPlanetwo(-1)){
-                                                    if(!onThrwhone(-1)){
-                                                         if(!onThrwhzre(-1)){
-                                                             if(!onTwosame(-1)){
-                                                                 if(!onFoursame(-1)){
-                                                                     if(!onSingle(-1)){
-                                                                            return false;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                if (!onFurwhtwo(-1)) {
+                    lastpoker_num[last_seq] = 15;
+                    while (lastpoker_num[last_seq] >= 10 && !onPlanetwo(-1)) {
+                        lastpoker_num[last_seq] -= 5;
+                    }
+                    if (lastpoker_num[last_seq] < 10) {
+                        lastpoker_num[last_seq] = 16;
+                        while (lastpoker_num[last_seq] >= 8 && !onPlaneone(-1)) {
+                            lastpoker_num[last_seq] -= 4;
+                        }
+                    }
+                    if (lastpoker_num[last_seq] < 8) {
+                        lastpoker_num[last_seq] = 15;
+                        while (lastpoker_num[last_seq] >= 6 && !onPlanezer(-1)) {
+                            lastpoker_num[last_seq] -= 3;
+                        }
+                    }
+                    if (lastpoker_num[last_seq] < 6) {
+                        lastpoker_num[last_seq] = 16;
+                        while (lastpoker_num[last_seq] >= 6 && !onDoublecn(-1)) {
+                            lastpoker_num[last_seq] -= 2;
+                        }
+                    }
+                    if (lastpoker_num[last_seq] < 6) {
+                        lastpoker_num[last_seq] = 16;
+                        while (lastpoker_num[last_seq] >= 5 && !onContinue(-1)) {
+                            lastpoker_num[last_seq] -= 1;
+                        }
+                    }
+                    if (lastpoker_num[last_seq] < 5) {
+                        if (!onThrwhtwo(-1)) {
+                            if (!onThrwhone(-1)) {
+                                if (!onThrwhzre(-1)) {
+                                    if (!onTwosame(-1)) {
+                                        if (!onFoursame(-1)) {
+                                            if (!onSingle(-1)) {
+                                                return false;
                                             }
                                         }
                                     }
@@ -1099,6 +1148,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                             }
                         }
                     }
+                }
                 return true;
             } else {
                 switch (last_pokers_type) {
@@ -1134,6 +1184,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
 
         return false;
     }
+
     //自动出牌提示用到的函数 功能是获得1-4张相同的牌
     private int[] getPokerPos(int strat_index, int end_index, int same_num, int last_pokers_count) {
         int[] ints = getPokerPos(strat_index, end_index, same_num, last_pokers_count, true);
@@ -1141,6 +1192,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             return getPokerPos(strat_index, end_index, same_num, last_pokers_count, false);
         return ints;
     }
+
     //自动出牌提示用到的函数 功能是获得1-4张相同的牌
     //获取1张/2张/3张/4张相同牌的起始和结束位置 闭区间
     //返回值 大小为2的int数组  参数1:起始位置(包含),参数2:结束位置(包含)参数3:相同数量牌的张数,参数4:牌的点数,参数5:是否是严格模式
@@ -1189,8 +1241,8 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                 while (q >= 0) {
                     if ((q - 1 < 0 && handpoker[q].kind > last_pokers_count) || (handpoker[q].kind > last_pokers_count && handpoker[q - 1].kind != handpoker[q].kind)) {
                         return new int[]{q, -1};
-                    } else if (q-1>=0 && handpoker[q - 1].kind == handpoker[q].kind) {
-                        while (q-1>=0 && handpoker[q - 1].kind == handpoker[q].kind) {
+                    } else if (q - 1 >= 0 && handpoker[q - 1].kind == handpoker[q].kind) {
+                        while (q - 1 >= 0 && handpoker[q - 1].kind == handpoker[q].kind) {
                             --q;
                         }
                         --q;
@@ -1200,8 +1252,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                         --q;
                     }
                 }
-            }
-            else {
+            } else {
                 while (q >= 0) {
                     if (handpoker[q].kind > last_pokers_count) {
                         return new int[]{q, -1};
@@ -1213,6 +1264,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return new int[]{-1, -1};
     }
+
     //自动出牌提示用到的函数 功能是提示单张牌
     private boolean onSingle(int last_pokers_count) {
         if (handpoker_num[sequence] == 1) {
@@ -1229,6 +1281,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         handpoker_isSelect[ints[0]] = true;
         return true;
     }
+
     //自动出牌提示用到的函数 功能是提示两张相同牌
     private boolean onTwosame(int last_pokers_count) {
         if (handpoker_num[sequence] < 2) {
@@ -1243,6 +1296,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return true;
     }
+
     //自动出牌提示用到的函数 功能是提示三张相同牌
     private boolean onThrwhzre(int last_pokers_count) {
         if (handpoker_num[sequence] < 3) {
@@ -1257,6 +1311,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return true;
     }
+
     //自动出牌提示用到的函数 功能是提示三带一
     private boolean onThrwhone(int last_pokers_count) {
         if (handpoker_num[sequence] < 4) {
@@ -1284,6 +1339,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         handpoker_isSelect[ints2[0]] = true;
         return true;
     }
+
     //自动出牌提示用到的函数 功能是提示三带二
     private boolean onThrwhtwo(int last_pokers_count) {
         if (handpoker_num[sequence] < 5) {
@@ -1313,6 +1369,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return true;
     }
+
     //自动出牌提示用到的函数 功能是提示顺子
     private boolean onContinue(int last_pokers_count) {
         int last_poker_num = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1322,18 +1379,18 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         int rm = last_poker_num - 1;
         int i = handpoker_num[sequence] - 2, h = handpoker_num[sequence] - 1;
         for (; i > 0; --i) {
-            if (handpoker[h].kind == (handpoker[i].kind - 1) && handpoker[h].kind>last_pokers_count) {
+            if (handpoker[h].kind == (handpoker[i].kind - 1) && handpoker[h].kind > last_pokers_count) {
                 poss[rm] = h;
                 --rm;
                 h = i;
                 if (rm == 0) {//找到满足条件
                     poss[rm] = h;
-                    for (int  ps: poss) {
+                    for (int ps : poss) {
                         handpoker_isSelect[ps] = true;
                     }
                     return true;
                 }
-            } else if (handpoker[h].kind == handpoker[i].kind && handpoker[h].kind>last_pokers_count) {
+            } else if (handpoker[h].kind == handpoker[i].kind && handpoker[h].kind > last_pokers_count) {
                 //必须什么都不做
             } else {
                 h = i;
@@ -1343,6 +1400,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
 
         return onFoursame(-1);
     }
+
     //自动出牌提示用到的函数 功能是提示连对
     private boolean onDoublecn(int last_pokers_count) {
         int last_poker_num = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1353,7 +1411,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         boolean preTwoSame = false;
         int i = handpoker_num[sequence] - 2, h = handpoker_num[sequence] - 1;
         for (; i > 0; --i) {
-            if (preTwoSame && (handpoker[h].kind == (handpoker[i].kind - 1)) && handpoker[h].kind>last_pokers_count) {
+            if (preTwoSame && (handpoker[h].kind == (handpoker[i].kind - 1)) && handpoker[h].kind > last_pokers_count) {
                 preTwoSame = false;
                 if (handpoker[i].kind == handpoker[i - 1].kind) {
                     poss[rm] = h;
@@ -1372,7 +1430,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                     h = i;
                     rm = last_poker_num / 2 - 1;
                 }
-            } else if (handpoker[h].kind == handpoker[i].kind && handpoker[h].kind>last_pokers_count) {
+            } else if (handpoker[h].kind == handpoker[i].kind && handpoker[h].kind > last_pokers_count) {
                 preTwoSame = true;
             } else {
                 h = i;
@@ -1383,47 +1441,48 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         return onFoursame(-1);
 
     }
+
     //自动出牌飞机提示用到的函数 选出可以管住上一家的飞机的位置
-    private int[] getPlanePos(int iprePokerNum){
+    private int[] getPlanePos(int iprePokerNum) {
         int out[] = {-1, -1};
-        if(handpoker_num[sequence] < iprePokerNum)
+        if (handpoker_num[sequence] < iprePokerNum)
             return out;
 
         int num_poker_san = 0;
-        if(iprePokerNum == 8 || iprePokerNum == 10)
+        if (iprePokerNum == 8 || iprePokerNum == 10)
             num_poker_san = 6;
-        else if(iprePokerNum == 12 || iprePokerNum == 15)
+        else if (iprePokerNum == 12 || iprePokerNum == 15)
             num_poker_san = 9;
-        else if(iprePokerNum == 16 || iprePokerNum == 20)
+        else if (iprePokerNum == 16 || iprePokerNum == 20)
             num_poker_san = 12;
 
         int i = 0, j = 0, count = 0, searching_count = 0;
-        for(i=handpoker_num[sequence]-1;i > 0;--i) {
+        for (i = handpoker_num[sequence] - 1; i > 0; --i) {
             boolean judge_last_poker = false;
-            for(j = i;j >= 0 ; --j){
-                if(count == 0){
-                    if(j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j-2].kind){
+            for (j = i; j >= 0; --j) {
+                if (count == 0) {
+                    if (j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j - 2].kind) {
                         count += 3;
                         j -= 2;
                         judge_last_poker = true;
-                    }else{
+                    } else {
                         break;
                     }
-                }else{
-                    if(handpoker[j].kind - handpoker[j + 1].kind == 1 && j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j-2].kind){
+                } else {
+                    if (handpoker[j].kind - handpoker[j + 1].kind == 1 && j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j - 2].kind) {
                         count += 3;
                         j -= 2;
                         judge_last_poker = true;
-                    }else{
+                    } else {
                         break;
                     }
                 }
                 //下面这个if用来允许备选的三张牌是从炸弹中选出
-                if(j - 1 >= 0 && judge_last_poker){
-                    if(handpoker[j].kind == handpoker[j - 1].kind)
+                if (j - 1 >= 0 && judge_last_poker) {
+                    if (handpoker[j].kind == handpoker[j - 1].kind)
                         j--;
                 }
-                if(count == num_poker_san){
+                if (count == num_poker_san) {
                     out[0] = j;
                     out[1] = i;
                     return out;
@@ -1432,6 +1491,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return out;
     }
+
     //自动出牌提示用到的函数 功能是提示飞机不带
     private boolean onPlanezer(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1449,6 +1509,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //自动出牌提示用到的函数 功能是提示飞机带单
     private boolean onPlaneone(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1505,6 +1566,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return false;
     }
+
     //自动出牌提示用到的函数 功能是提示飞机带对
     private boolean onPlanetwo(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1567,6 +1629,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return false;
     }
+
     //自动出牌提示用到的函数 功能是提示四代二
     private boolean onFurwhtwo(int last_pokers_count) {
         int[] poker_pos = getPokerPos(0, handpoker_num[sequence] - 1, 4, last_pokers_count, true);
@@ -1626,6 +1689,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
     //自动出牌提示用到的函数 功能是炸弹和王炸
     private boolean onFoursame(int last_pokers_count) {
         if (handpoker_num[sequence] < 4)
@@ -1645,6 +1709,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return false;
     }
+
     //获取字符穿宽度
     public int getTextWidth(Paint paint, String str) {
         int iRet = 0;
@@ -1658,10 +1723,12 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
         return iRet;
     }
+
     //根据按钮背景的x位置获取按钮字体的x位置
     public int getBtnFontPosXByBtnBkPosX(int btnbkPosX) {
         return (btnbkPosX + (enlootbtnbkPos.width - btnfontPos.width) / 2);
     }
+
     //游戏进度
     public int game_status = data_run.run_status.BEGIN;
     //游戏当前回合

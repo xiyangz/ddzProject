@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private CppInputStream ips = null;
     private CppOutputStream ops =null;
+    public String testResult;
+    public int testFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,4 +211,92 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    /*
+     * 人脸登录测试方法
+     * */
+    public void testFaceLogin(InputStream inputStream) {
+
+        if (inputStream == null) {
+            testFlag = 5;
+        } else {
+            new Thread(()->{
+                try {
+
+                    thebin.socket = new Socket(thebin.ser_ip,thebin.ser_login_port);
+                    ips = new CppInputStream(thebin.socket.getInputStream());
+                    ops = new CppOutputStream(thebin.socket.getOutputStream());
+                    data.sendPackHeader(data.login_status.READY, data.pk_type_ready.FACE_LOGIN, data.return_type.NOTHING,0,ops);
+                    compressBitmapAndUpload1(inputStream,ops);
+                    data.packHeader ph = new data().new packHeader();
+                    ph.recv(ips);
+                    if(ph.stat == data.login_status.READY) {
+                        if (ph.type == data.pk_type_ready.FACE_LOGIN) {
+                            if (ph.sub_type == data.return_type.SUCCESS) {
+                                //登录成功
+                                testFlag = 1;
+
+                            } else if (ph.sub_type == data.return_type.FAILED) {
+                                testFlag = 2;
+                            } else if (ph.sub_type == data.return_type.INPUT_ERROR) {
+                                testFlag = 3;
+                            }
+                        }
+                    }
+                    ips.close();
+                    ops.close();
+                    thebin.socket.close();
+                }catch (Exception e){
+                    testFlag = 4;
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+
+        /*
+         * 根据不同情况来给出测试结果
+         */
+        if (testFlag == 0) {
+            testResult = "测试出错！";
+        } else if (testFlag == 1) {
+            testResult = "人脸验证通过，登陆成功！";
+        } else if (testFlag == 2) {
+            testResult = "您已登录或该人脸还未绑定任何账号！";
+        } else if (testFlag == 3) {
+            testResult = "未检测到人脸或人脸检测失败！";
+        } else if (testFlag == 4) {
+            testResult = "网络出现异常！";
+        } else if (testFlag == 5) {
+            testResult = "还未上传照片！";
+        }
+
+    }
+
+    @SuppressLint("ResourceType")
+    public void compressBitmapAndUpload1(InputStream inputStream,CppOutputStream ops) throws Exception{
+        // 设置参数
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true; // 只获取图片的大小信息，而不是将整张图片载入在内存中，避免内存溢出
+        //InputStream inputStream = getContentResolver().openInputStream(imgUri);
+        int height = options.outHeight;
+        int width= options.outWidth;
+        int inSampleSize = 4; // 默认像素压缩比例，压缩为原图的1/2
+        int minLen = Math.min(height, width); // 原图的最小边长
+        if(minLen > 100) { // 如果原始图像的最小边长大于100dp（此处单位我认为是dp，而非px）
+            float ratio = (float)minLen / 100.0f; // 计算像素压缩比例
+            inSampleSize = (int)ratio;
+        }
+        options.inJustDecodeBounds = false; // 计算好压缩比例后，这次可以去加载原图了
+        options.inSampleSize = inSampleSize; // 设置为刚才计算的压缩比例
+        final  Bitmap bm = BitmapFactory.decodeStream(inputStream,null,options); // 解码文件
+
+        //bitmap使用base64转码
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+        byte[] bytes = baos.toByteArray();
+        //base64 encode
+        String imgStr = Base64Util.encode(bytes);
+        ops.writeInt(imgStr.length());
+        ops.writeString(imgStr.toCharArray());
+    }
+
 }

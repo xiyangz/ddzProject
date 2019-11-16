@@ -25,6 +25,8 @@ public class  LoginActivity extends AppCompatActivity {
     public static String password=null;
     private CppInputStream ips = null;
     private CppOutputStream ops =null;
+    public String testResult;
+    public int testFlag;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,4 +142,76 @@ public class  LoginActivity extends AppCompatActivity {
             }
         },"thread1").start();
     }
+    /*
+     * 常规登录测试方法
+     * */
+    public void usualLogin(String account, String password) {
+
+        String str_act = account;
+        String str_pwd = password;
+        //Message msg = new Message();
+
+        if(str_act.length() == 0 || str_act == null) {
+            testResult = "账号不能为空！";
+        }
+        else if(str_pwd.length()==0 || str_act == null){
+            testResult = "密码不能为空！";
+        }
+        new Thread(()->{
+            try
+            {
+
+                thebin.socket = new Socket(thebin.ser_ip,thebin.ser_login_port);
+                ips = new CppInputStream(thebin.socket.getInputStream());
+                ops = new CppOutputStream(thebin.socket.getOutputStream());
+
+                data_common.user_login ul =new data_common().new user_login();
+                stringToCharArray.stringToCharAry(ul.account,str_act);
+                stringToCharArray.stringToCharAry(ul.password,str_pwd);
+                data.sendPackHeader(data.login_status.READY,data.pk_type_ready.NORM_LOGIN,data.return_type.NOTHING,0,ops);
+                ul.send(ops);
+                data.packHeader ph2 = new data().new packHeader();
+                ph2.recv(ips);
+                if(ph2.stat == data.login_status.READY) {
+                    if(ph2.type == data.pk_type_ready.NORM_LOGIN){
+                        if(ph2.sub_type == data.return_type.SUCCESS){
+                            testFlag = 1;
+                            //testResult = "登陆成功！";
+                        }
+                        else if(ph2.sub_type == data.return_type.INPUT_ERROR){
+                            testFlag = 2;
+                            //testResult = "密码不能为空！";
+                        }
+                        else if(ph2.sub_type == data.return_type.FAILED){
+                            testFlag = 3;
+                            //testResult = "登陆失败,账号可能已经在线";
+                        }
+                    }
+
+                }
+                ips.close();
+                ops.close();
+                thebin.socket.close();
+            }
+            catch (Exception e)
+            {
+                testFlag = 4;
+
+            }
+        },"thread1").start();
+        if (testFlag == 1) {
+            testResult = "登陆成功！";
+        }
+        if (testFlag == 2) {
+            testResult = "账号或者密码错误！";
+        }
+        if (testFlag == 3) {
+            testResult = "登陆失败,账号可能已经在线";
+        }
+        if (testFlag == 4) {
+            testResult = "网络异常！";
+        }
+
+    }
+
 }
