@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/ddz_login1"
+    tools:context=".LoginActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <include
+            android:id="@+id/input_layout"
+            layout="@layout/input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <include
+            android:id="@+id/layout_progress"
+            layout="@layout/layout_progress"
+            android:layout_width="match_parent"
+            android:layout_height="130dip"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/input_layout"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_log"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:layout_below="@+id/input_layout"
+                android:layout_marginRight="50dp"
+                android:background="#ffffff"
+                android:onClick="onLogin"
+                android:text="登录"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/register"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:layout_below="@+id/input_layout"
+                android:layout_marginLeft="50dp"
+                android:background="#ffffff"
+                android:onClick="onBack"
+                android:text="返回"
+
+                android:textColor="#000000"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

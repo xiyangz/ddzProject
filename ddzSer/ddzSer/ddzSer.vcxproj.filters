@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\data">
+      <UniqueIdentifier>{43eae47d-c17f-439b-aa57-8c645b3acf72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\data">
+      <UniqueIdentifier>{83fa8bd3-dd2b-440b-9ab0-0d8331b03ff8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="sql_ado.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ddzrun.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ddzServer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sock.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="team_manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="struct_common.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="data_common.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="data_login.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="data_run.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="struct_login.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="struct_team.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="struct_trans.cpp">
+      <Filter>源文件\data</Filter>
+    </ClCompile>
+    <ClCompile Include="face.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sql_ado.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ddzrun.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="team_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="struct_common.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="struct_login.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="struct_team.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="struct_trans.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="data_login.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="data_run.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="data_common.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="face.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

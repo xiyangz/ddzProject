@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ddzClient</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_team">TeamActivity</string>
+</resources>
