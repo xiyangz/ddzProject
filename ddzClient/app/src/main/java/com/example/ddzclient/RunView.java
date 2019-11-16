@@ -67,6 +67,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     private bmpPosInfo enpokebtnbkPos = new bmpPosInfo();
     private bmpPosInfo unpokebtnbkPos = new bmpPosInfo();
     private bmpPosInfo hintbtnbkPos = new bmpPosInfo();
+    private bmpPosInfo autopkbtnbkPos = new bmpPosInfo();
     //'抢地主' '不抢'  '不出'的字图片大小
     private bmpPosInfo resultftPos_left = new bmpPosInfo();
     private bmpPosInfo resultftPos_mid = new bmpPosInfo();
@@ -119,6 +120,8 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     private Bitmap userlo_bmp = null;
     private Bitmap userfm_bmp = null;
 
+    private Bitmap autopk_bmp = null;
+    private Bitmap cancelautopk_bmp = null;
 
     public RunView(Context context) {
         super(context);
@@ -292,6 +295,10 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             userdef_bmp[1] = BitmapFactory.decodeStream(is, null, opt);
             is = getResources().openRawResource(R.drawable.user_def3);
             userdef_bmp[2] = BitmapFactory.decodeStream(is, null, opt);
+            is = getResources().openRawResource(R.drawable.autopk);
+            autopk_bmp = BitmapFactory.decodeStream(is, null, opt);
+            is = getResources().openRawResource(R.drawable.cancelautopk);
+            cancelautopk_bmp = BitmapFactory.decodeStream(is, null, opt);
         } catch (Resources.NotFoundException e) {
         }
 
@@ -455,6 +462,11 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         exitPos.width = (int) (exit_width_height_ratio * clockPos_left.height);
         exitPos.left_x = (tra.ScreenX - clockPos_left.width) / 2;
         exitPos.top_y = tra.ScreenY / 2;
+
+        autopkbtnbkPos.width = enlootbtnbkPos.width;
+        autopkbtnbkPos.height = enlootbtnbkPos.height;
+        autopkbtnbkPos.left_x = tra.ScreenX - autopkbtnbkPos.width;
+        autopkbtnbkPos.top_y = tra.ScreenY - autopkbtnbkPos.height;
     }
 
     //surfaceview 创建
@@ -624,6 +636,20 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         drawLooterThreePoker(canvas);
         //绘制用户头像和手牌数量
         drawUsersInfo(canvas);
+        //绘制托管
+        drawAutopk(canvas);
+    }
+
+    private void drawAutopk(Canvas canvas) {
+        autopkbtnbkPos.drawBitmap(btnnk_green_bmp,canvas);
+        int tempy = btnfontPos.top_y;
+        btnfontPos.left_x = getBtnFontPosXByBtnBkPosX(autopkbtnbkPos.left_x);
+        btnfontPos.top_y = autopkbtnbkPos.top_y+8;
+        if(isAutopk)
+            btnfontPos.drawBitmap(cancelautopk_bmp, canvas);
+        else
+            btnfontPos.drawBitmap(autopk_bmp, canvas);
+        btnfontPos.top_y = tempy;
     }
 
     //绘制结束阶段画面
@@ -849,12 +875,42 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         turn = newTurn;
         isFirst = tra.ips.readInt() == 0 ? false : true;
         remain_sec = 15;
-        drawRunMain();
-        int last_turn = turn - 1 < 0 ? 2 : turn - 1;
-        if (handpoker_num[last_turn] == 0) {
+        if (handpoker_num[turn - 1 < 0 ? 2 : turn - 1] == 0) {
             game_status = data_run.run_status.END;
             Thread.sleep(3000);
             drawRunMain();
+        }
+        drawRunMain();
+
+        if(turn == sequence && isAutopk){
+            onAutopk();
+        }
+    }
+
+    private void onAutopk() {
+        if (setHintPoker()){
+            drawRunMain();
+            //判断有多少牌谈起了弹起的牌需要大于0
+            int k = 0;
+            for (int i = 0; i < handpoker_num[sequence]; i++) {
+                if (handpoker_isSelect[i]) {
+                    readypokepokers[k] = i;
+                    k++;
+                }
+            }
+            if (k != 0) {
+                readypokepokers_num = k;
+                tra.ClickPoke(readypokepokers, k);
+            } else {//没选出牌给提示
+                readypokepokers_num = 0;
+            }
+        }
+        else {
+            for (int i = 0; i < handpoker_num[sequence]; i++) {
+                handpoker_isSelect[i] = false;
+            }
+            readypokepokers_num = 0;
+            tra.ClickUnPoke();
         }
     }
 
@@ -1059,6 +1115,15 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 }
             }
+        }
+
+        if(x>= autopkbtnbkPos.left_x && x<=autopkbtnbkPos.left_x+autopkbtnbkPos.width && y>=autopkbtnbkPos.top_y && y<=autopkbtnbkPos.top_y+autopkbtnbkPos.height){
+            if(isAutopk)
+                isAutopk =false;
+            else
+                isAutopk =true;
+            drawRunMain();
+            onAutopk();
         }
     }
 
@@ -1372,56 +1437,6 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    //三带对提示
-    private boolean onThrwhtwo(){
-        int[] poker_pos = getPokerPos(0, handpoker_num[sequence] - 1, 3, last_pokers_count, true);
-
-        if(poker_pos[0] == -1)
-            return onFoursame(-1);
-        else{
-            //poker_pos_out中[0,1]存放比找到的poker_pos小的对的位置
-            //poker_pos_out中[2,3]存放比找到的poker_pos大的对的位置
-            //poker_pos_out中[4,5]存放比找到的poker_pos小的三张牌取两张的的位置
-            //poker_pos_out中[6,7]存放比找到的poker_pos大的三张牌取两张的的位置
-            int poker_pos_out[] ={-1,-1,-1,-1,-1,-1,-1,-1};
-            int temp[] = {-1, -1};
-            temp = getPokerPos(poker_pos[1] + 1, handpoker_num[sequence]-1, 2, -1, true);
-            if(temp[0] != -1){
-                poker_pos_out[0] = temp[0];
-                poker_pos_out[1] = temp[1];
-            }
-            temp = getPokerPos(0, poker_pos[0] - 1, 2, -1, true);
-            if(temp[0] != -1){
-                poker_pos_out[2] = temp[0];
-                poker_pos_out[3] = temp[1];
-            }
-            temp = getPokerPos(poker_pos[1] + 1, handpoker_num[sequence]-1, 2, -1, false);
-            if(temp[0] != -1){
-                poker_pos_out[4] = temp[0];
-                poker_pos_out[5] = temp[1];
-            }
-            temp = getPokerPos(0, poker_pos[0] - 1, 2, -1, false);
-            if(temp[0] != -1){
-                poker_pos_out[6] = temp[0];
-                poker_pos_out[7] = temp[1];
-            }
-            int i = 0;
-            while(i < 8 && poker_pos_out[i ++] == -1){
-                break;
-            }
-            if(i < 7){
-                for (int z = poker_pos[0]; z <= poker_pos[1]; z++) {
-                    handpoker_isSelect[z] = true;
-                }
-                handpoker_isSelect[poker_pos_out[i]] = true;
-                handpoker_isSelect[poker_pos_out[i + 1]] = true;
-                return true;
-            }else{
-                return false;
-            }
-        }
-
-    }
     //自动出牌提示用到的函数 功能是提示顺子
     private boolean onContinue(int last_pokers_count) {
         int last_poker_num = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1495,191 +1510,160 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //自动出牌飞机提示用到的函数 选出可以管住上一家的飞机的位置
-    private int[] getPlanePos(int iprePokerNum) {
-        int out[] = {-1, -1};
-        if (handpoker_num[sequence] < iprePokerNum)
-            return out;
-
-        int num_poker_san = 0;
-        if (iprePokerNum == 8 || iprePokerNum == 10)
-            num_poker_san = 6;
-        else if (iprePokerNum == 12 || iprePokerNum == 15)
-            num_poker_san = 9;
-        else if (iprePokerNum == 16 || iprePokerNum == 20)
-            num_poker_san = 12;
-
-        int i = 0, j = 0, count = 0, searching_count = 0;
-        for (i = handpoker_num[sequence] - 1; i > 0; --i) {
-            boolean judge_last_poker = false;
-            for (j = i; j >= 0; --j) {
-                if (count == 0) {
-                    if (j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j - 2].kind) {
-                        count += 3;
-                        j -= 2;
-                        judge_last_poker = true;
-                    } else {
-                        break;
-                    }
+    //选出可以管住上一家的飞机的位置
+    private int[][] getPlanePos(int planeNum) {
+        int[][] intss = new int[planeNum][];
+        for (int i = 0; i < planeNum; i++)
+            intss[i] = new int[2];
+        int i = 0, x = 0, y = handpoker_num[sequence] - 1, preKind = 0, theKind = 0;
+        while (i < planeNum) {
+            intss[i] = getPokerPos(x, y, 3, last_pokers_count);
+            if (i == 0 && intss[i][0] == -1) {
+                intss[0][0] = -1;
+                return intss;
+            } else if (i != 0) {
+                if (intss[i][0] == -1) {
+                    intss[0][0] = -1;
+                    return intss;
                 } else {
-                    if (handpoker[j].kind - handpoker[j + 1].kind == 1 && j - 2 >= 0 && handpoker[j].kind > last_pokers_count && handpoker[j - 1].kind == handpoker[j].kind && handpoker[j].kind == handpoker[j - 2].kind) {
-                        count += 3;
-                        j -= 2;
-                        judge_last_poker = true;
-                    } else {
-                        break;
+                    theKind = handpoker[intss[i][0]].kind;
+                    if (theKind != preKind + 1) {
+                        intss[0][0] = -1;
+                        return intss;
                     }
-                }
-                //下面这个if用来允许备选的三张牌是从炸弹中选出
-                if (j - 1 >= 0 && judge_last_poker) {
-                    if (handpoker[j].kind == handpoker[j - 1].kind)
-                        j--;
-                }
-                if (count == num_poker_san) {
-                    out[0] = j;
-                    out[1] = i;
-                    return out;
                 }
             }
+            preKind = theKind;
+            x = 0;
+            y = intss[i][0] - 1;
+            i++;
         }
-        return out;
+        return intss;
     }
 
     //自动出牌提示用到的函数 功能是提示飞机不带
     private boolean onPlanezer(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
-        int[] planePos = getPlanePos(iprePokerNum);
-        if (planePos[0] == -1)
+        if (handpoker_num[sequence] < iprePokerNum)
+            return onFoursame(-1);
+        int planeNum = iprePokerNum / 3;
+        int[][] intss = getPlanePos(planeNum);
+        if (intss[0][0] == -1)
             return onFoursame(-1);
         else {
-            if (handpoker[planePos[1]].kind == 13)
-                return onFoursame(-1);
-            else {
-                for (int z = planePos[0]; z <= planePos[1]; z++) {
-                    handpoker_isSelect[z] = true;
+            for (int j = 0; j < planeNum; j++) {
+                for (int k = intss[j][0]; k < intss[j][1]; k++) {
+                    handpoker_isSelect[k] = true;
                 }
-                return true;
             }
+            return true;
         }
     }
 
     //自动出牌提示用到的函数 功能是提示飞机带单
     private boolean onPlaneone(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
-        int[] planePos = getPlanePos(iprePokerNum);
-        if (planePos[0] == -1) {
+        if (handpoker_num[sequence] < iprePokerNum)
             return onFoursame(-1);
-        } else {
-            if (handpoker[planePos[1]].kind == 13)
-                return onFoursame(-1);
-            else {
-                int poker_pos_out[] = {-1, -1, -1, -1, -1, -1, -1, -1};
-                int temp[] = {-1, -1};
-                temp = getPokerPos(planePos[1] + 1, handpoker_num[sequence] - 1, 1, -1, true);
-                poker_pos_out[0] = temp[0];
-                if (temp[0] != -1) {//找小于poker_pos的第二个单牌
-                    temp = getPokerPos(planePos[1] + 1, temp[0] - 1, 1, -1, true);
-                    poker_pos_out[1] = temp[0];
+        int planeNum = iprePokerNum / 4;
+        int[][] intss = getPlanePos(planeNum);
+        if (intss[0][0] == -1)
+            return onFoursame(-1);
+        else {
+            int[][] intss2 = new int[planeNum][2];
+            for (int i = 0; i < planeNum; i++)
+                intss2[i] = new int[2];
+            int count = 0, x = 0, y = handpoker_num[sequence] - 1;
+            boolean isFound = false;
+            for (int j = 0; j < planeNum + 1; ++j) {
+                if (isFound) {//找到了intss2
+                    isFound = false;
+                } else {//没找到intss2
+                    if (j != planeNum)
+                        x = intss[j][1] + 1;
+                    else
+                        x = 0;
+                    if (j != 0)
+                        y = intss[j - 1][0] - 1;
+                    else
+                        y = handpoker_num[sequence] - 1;
                 }
-                temp = getPokerPos(0, planePos[0] - 1, 1, -1, true);
-                poker_pos_out[2] = temp[0];
-                if (temp[0] != -1) {
-                    temp = getPokerPos(0, temp[0] - 1, 1, -1, true);
-                    poker_pos_out[3] = temp[0];
-                }
-                temp = getPokerPos(planePos[1] + 1, handpoker_num[sequence] - 1, 2, -1, false);
-                poker_pos_out[4] = temp[0];
-                poker_pos_out[5] = temp[1];
-                temp = getPokerPos(0, planePos[0] - 1, 2, -1, false);
-                poker_pos_out[6] = temp[0];
-                poker_pos_out[7] = temp[1];
-                int count = 0;
-                for (int i = 0; i < 8; i++) {
-                    if (poker_pos_out[i] != -1)
-                        count++;
-                    if (count == iprePokerNum / 4)
-                        break;
-                }
-                if (count == iprePokerNum / 4) {
-                    for (int z = planePos[0]; z <= planePos[1]; z++) {
-                        handpoker_isSelect[z] = true;
-                    }
-                    for (int z = 0; z < 8; z++) {
-                        if (count == 0)
-                            break;
-                        int pos = poker_pos_out[z];
-                        if (poker_pos_out[z] != -1) {
-                            handpoker_isSelect[pos] = true;
-                            count--;
+                intss2[count] = getPokerPos(x, y, 1, -1);
+                if (intss2[count][0] != -1) {
+                    //找到了一个单张可能左边还有单张 需要继续找
+                    count++;
+                    isFound = true;
+                    y = intss2[count][0] - 1;
+                    --j;
+                    if (count == planeNum) {
+                        for (int m = 0; m < planeNum; m++) {
+                            for (int n = intss[m][0]; n < intss[m][1]; n++) {
+                                handpoker_isSelect[n] = true;
+                            }
                         }
+                        for (int m = 0; m < planeNum; m++) {
+                            handpoker_isSelect[intss2[m][0]] = true;
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
+            return onFoursame(-1);
         }
-        return false;
     }
 
     //自动出牌提示用到的函数 功能是提示飞机带对
     private boolean onPlanetwo(int last_pokers_count) {
         int iprePokerNum = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
-        int[] planePos = getPlanePos(iprePokerNum);
-        if (planePos[0] == -1) {
+        if (handpoker_num[sequence] < iprePokerNum)
             return onFoursame(-1);
-        } else {
-            if (handpoker[planePos[1]].kind == 13) {
-                return onFoursame(-1);
-            } else {
-                //poker_pos_out中[0,1]存放比找到的poker_pos小的对的位置
-                //poker_pos_out中[2,3]存放比找到的poker_pos大的对的位置
-                //poker_pos_out中[4,5]存放比找到的poker_pos小的三张牌取两张的的位置
-                //poker_pos_out中[6,7]存放比找到的poker_pos大的三张牌取两张的的位置
-                int poker_pos_out[] = {-1, -1, -1, -1, -1, -1, -1, -1};
-                int temp[] = {-1, -1};
-                int count = 0;//统计找出的对的数目
-                temp = getPokerPos(planePos[1] + 1, handpoker_num[sequence] - 1, 2, -1, true);
-                if (temp[0] != -1) {
-                    poker_pos_out[0] = temp[0];
-                    poker_pos_out[1] = temp[1];
-                    count++;
+        int planeNum = iprePokerNum / 5;
+        int[][] intss = getPlanePos(planeNum);
+        if (intss[0][0] == -1)
+            return onFoursame(-1);
+        else {
+            int[][] intss2 = new int[planeNum][2];
+            for (int i = 0; i < planeNum; i++)
+                intss2[i] = new int[2];
+            int count = 0, x = 0, y = handpoker_num[sequence] - 1;
+            boolean isFound = false;
+            for (int j = 0; j < planeNum + 1; ++j) {
+                if (isFound) {//找到了intss2
+                    isFound = false;
+                } else {//没找到intss2
+                    if (j != planeNum)
+                        x = intss[j][1] + 1;
+                    else
+                        x = 0;
+                    if (j != 0)
+                        y = intss[j - 1][0] - 1;
+                    else
+                        y = handpoker_num[sequence] - 1;
                 }
-                temp = getPokerPos(0, planePos[0] - 1, 2, -1, true);
-                if (temp[0] != -1) {
-                    poker_pos_out[2] = temp[0];
-                    poker_pos_out[3] = temp[1];
+                intss2[count] = getPokerPos(x, y, 2, -1);
+                if (intss2[count][0] != -1) {
+                    //找到了一个单张可能左边还有单张 需要继续找
                     count++;
-                }
-                temp = getPokerPos(planePos[1] + 1, handpoker_num[sequence] - 1, 2, -1, false);
-                if (temp[0] != -1) {
-                    poker_pos_out[4] = temp[0];
-                    poker_pos_out[5] = temp[1];
-                    count++;
-                }
-                temp = getPokerPos(0, planePos[0] - 1, 2, -1, false);
-                if (temp[0] != -1) {
-                    poker_pos_out[6] = temp[0];
-                    poker_pos_out[7] = temp[1];
-                    count++;
-                }
-                if (count >= iprePokerNum / 5) {
-                    for (int z = planePos[0]; z <= planePos[1]; z++) {
-                        handpoker_isSelect[z] = true;
-                    }
-                    int num = iprePokerNum / 5;//需要几个对
-                    for (int z = 0; z < 8; z++) {
-                        if (num == 0)
-                            break;
-                        int pos = poker_pos_out[z];
-                        if (poker_pos_out[z] != -1) {
-                            handpoker_isSelect[pos] = true;
-                            handpoker_isSelect[poker_pos_out[++z]] = true;
-                            num--;
+                    isFound = true;
+                    y = intss2[count][0] - 1;
+                    --j;
+                    if (count == planeNum) {
+                        for (int m = 0; m < planeNum; m++) {
+                            for (int n = intss[m][0]; n < intss[m][1]; n++) {
+                                handpoker_isSelect[n] = true;
+                            }
                         }
+                        for (int m = 0; m < planeNum; m++) {
+                            for (int n = intss2[m][0]; n < intss[m][1]; n++) {
+                                handpoker_isSelect[n] = true;
+                            }
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
+            return onFoursame(-1);
         }
-        return false;
     }
 
     //自动出牌提示用到的函数 功能是提示四代二
@@ -1786,6 +1770,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     //游戏当前回合
     public int turn = -1;
     public boolean isFirst = false;
+    public boolean isAutopk = false;
     //游戏回合剩余时间
     public int remain_sec = 15;
     //玩家自身是sequence  上一家是last_seq 下一家是next_seq
