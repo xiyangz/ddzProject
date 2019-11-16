@@ -1348,28 +1348,80 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         int[] ints = getPokerPos(0, handpoker_num[sequence] - 1, 3, last_pokers_count);
         if (ints[0] == -1)
             return onFoursame(-1);
-        int[] ints2 = getPokerPos(ints[1] + 1, handpoker_num[sequence] - 1, 2, -1, true);
-        if (ints2[0] == -1) {
-            ints2 = getPokerPos(0, ints[0] - 1, 2, -1, true);
+        else {
+            int[] ints2 = getPokerPos(ints[1] + 1, handpoker_num[sequence] - 1, 2, -1, true);
             if (ints2[0] == -1) {
-                ints2 = getPokerPos(ints[1] + 1, handpoker_num[sequence] - 1, 2, -1, false);
+                ints2 = getPokerPos(0, ints[0] - 1, 2, -1, true);
                 if (ints2[0] == -1) {
-                    ints2 = getPokerPos(0, ints[0] - 1, 2, -1, false);
+                    ints2 = getPokerPos(ints[1] + 1, handpoker_num[sequence] - 1, 2, -1, false);
                     if (ints2[0] == -1) {
-                        return onFoursame(-1);
+                        ints2 = getPokerPos(0, ints[0] - 1, 2, -1, false);
+                        if (ints2[0] == -1) {
+                            return onFoursame(-1);
+                        }
                     }
                 }
             }
+            for (int i = ints[0]; i <= ints[1]; i++) {
+                handpoker_isSelect[i] = true;
+            }
+            for (int i = ints2[0]; i <= ints2[1]; i++) {
+                handpoker_isSelect[i] = true;
+            }
+            return true;
         }
-        for (int i = ints[0]; i <= ints[1]; i++) {
-            handpoker_isSelect[i] = true;
-        }
-        for (int i = ints2[0]; i <= ints2[1]; i++) {
-            handpoker_isSelect[i] = true;
-        }
-        return true;
     }
 
+    //三带对提示
+    private boolean onThrwhtwo(){
+        int[] poker_pos = getPokerPos(0, handpoker_num[sequence] - 1, 3, last_pokers_count, true);
+
+        if(poker_pos[0] == -1)
+            return onFoursame(-1);
+        else{
+            //poker_pos_out中[0,1]存放比找到的poker_pos小的对的位置
+            //poker_pos_out中[2,3]存放比找到的poker_pos大的对的位置
+            //poker_pos_out中[4,5]存放比找到的poker_pos小的三张牌取两张的的位置
+            //poker_pos_out中[6,7]存放比找到的poker_pos大的三张牌取两张的的位置
+            int poker_pos_out[] ={-1,-1,-1,-1,-1,-1,-1,-1};
+            int temp[] = {-1, -1};
+            temp = getPokerPos(poker_pos[1] + 1, handpoker_num[sequence]-1, 2, -1, true);
+            if(temp[0] != -1){
+                poker_pos_out[0] = temp[0];
+                poker_pos_out[1] = temp[1];
+            }
+            temp = getPokerPos(0, poker_pos[0] - 1, 2, -1, true);
+            if(temp[0] != -1){
+                poker_pos_out[2] = temp[0];
+                poker_pos_out[3] = temp[1];
+            }
+            temp = getPokerPos(poker_pos[1] + 1, handpoker_num[sequence]-1, 2, -1, false);
+            if(temp[0] != -1){
+                poker_pos_out[4] = temp[0];
+                poker_pos_out[5] = temp[1];
+            }
+            temp = getPokerPos(0, poker_pos[0] - 1, 2, -1, false);
+            if(temp[0] != -1){
+                poker_pos_out[6] = temp[0];
+                poker_pos_out[7] = temp[1];
+            }
+            int i = 0;
+            while(i < 8 && poker_pos_out[i ++] == -1){
+                break;
+            }
+            if(i < 7){
+                for (int z = poker_pos[0]; z <= poker_pos[1]; z++) {
+                    handpoker_isSelect[z] = true;
+                }
+                handpoker_isSelect[poker_pos_out[i]] = true;
+                handpoker_isSelect[poker_pos_out[i + 1]] = true;
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+    }
     //自动出牌提示用到的函数 功能是提示顺子
     private boolean onContinue(int last_pokers_count) {
         int last_poker_num = lastpoker_num[last_seq] == 0 ? lastpoker_num[next_seq] : lastpoker_num[last_seq];
@@ -1694,7 +1746,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean onFoursame(int last_pokers_count) {
         if (handpoker_num[sequence] < 4)
             return false;
-        int[] ints = getPokerPos(0, handpoker_num[sequence] - 1, 4, -1);
+        int[] ints = getPokerPos(0, handpoker_num[sequence] - 1, 4, last_pokers_count);
         if (ints[0] == -1) {
             if (handpoker[0].kind == data_run.pkr_kind.POKER_B_JOKER && handpoker[1].kind == data_run.pkr_kind.POKER_L_JOKER) {
                 handpoker_isSelect[0] = true;
