@@ -644,7 +644,8 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
         autopkbtnbkPos.drawBitmap(btnnk_green_bmp,canvas);
         int tempy = btnfontPos.top_y;
         btnfontPos.left_x = getBtnFontPosXByBtnBkPosX(autopkbtnbkPos.left_x);
-        btnfontPos.top_y = autopkbtnbkPos.top_y+8;
+
+        btnfontPos.top_y = autopkbtnbkPos.top_y + (autopkbtnbkPos.height - btnfontPos.height) / 2;
         if(isAutopk)
             btnfontPos.drawBitmap(cancelautopk_bmp, canvas);
         else
