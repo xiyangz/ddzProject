@@ -1074,13 +1074,13 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
                 handpoker_isSelect[i] = false;
             }
             if (isFirst) {//第一个出牌 随便出
-                        if(!onPlanetwo(-1)){
+                        if(!onFurwhtwo(-1)){
                             if(!onPlaneone(-1)){
                                 if(!onPlanezer(-1)){
                                     if(!onDoublecn(-1)){
                                         if(!onContinue(-1)){
                                             if(!onThrwhtwo(-1)){
-                                                if(!onFurwhtwo(-1)){
+                                                if(!onPlanetwo(-1)){
                                                     if(!onThrwhone(-1)){
                                                          if(!onThrwhzre(-1)){
                                                              if(!onTwosame(-1)){
