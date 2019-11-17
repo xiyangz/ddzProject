@@ -1501,6 +1501,7 @@ public class RunView extends SurfaceView implements SurfaceHolder.Callback {
             } else if (handpoker[h].kind == handpoker[i].kind && handpoker[h].kind > last_pokers_count) {
                 preTwoSame = true;
             } else {
+                preTwoSame = false;
                 h = i;
                 rm = last_poker_num / 2 - 1;
             }
